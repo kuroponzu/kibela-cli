@@ -11,7 +11,19 @@ import (
 var (
 	jsonOutput bool
 	verbose    bool
+
+	// Version information
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
 )
+
+// SetVersion sets the version information.
+func SetVersion(v, c, d string) {
+	version = v
+	commit = c
+	date = d
+}
 
 // NewRootCmd creates the root command.
 func NewRootCmd() *cobra.Command {
@@ -36,8 +48,21 @@ func NewRootCmd() *cobra.Command {
 	rootCmd.AddCommand(newGetCmd())
 	rootCmd.AddCommand(newCreateCmd())
 	rootCmd.AddCommand(newUpdateCmd())
+	rootCmd.AddCommand(newVersionCmd())
 
 	return rootCmd
+}
+
+func newVersionCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "version",
+		Short: "Print version information",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Printf("kibela version %s\n", version)
+			fmt.Printf("  commit: %s\n", commit)
+			fmt.Printf("  built:  %s\n", date)
+		},
+	}
 }
 
 // Execute runs the root command.

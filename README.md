@@ -97,6 +97,23 @@ make build-all
 make clean
 ```
 
+## リリース
+
+タグをプッシュするとGitHub Actionsが自動的にリリースを作成します。
+
+```bash
+# バージョンタグを作成
+git tag v1.0.0
+
+# タグをプッシュ（リリースが自動実行される）
+git push origin v1.0.0
+```
+
+リリースされるバイナリ:
+- Linux (amd64, arm64)
+- macOS (amd64, arm64)
+- Windows (amd64)
+
 ## 終了コード
 
 | コード | 説明 |
