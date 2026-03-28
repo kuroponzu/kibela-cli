@@ -33,5 +33,5 @@ go.work.sum
 .tmp/
 
 # Build artifacts
-kibela
+/kibela
 /build/
