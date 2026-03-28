@@ -32,7 +32,7 @@ func (c *Client) GetNoteByID(ctx context.Context, id string) (*Note, error) {
 		query.Note.Title,
 		query.Note.Content,
 		query.Note.ContentHTML,
-		query.Note.CoEditing,
+		query.Note.Coediting,
 		query.Note.PublishedAt,
 		query.Note.UpdatedAt,
 		query.Note.URL,
@@ -61,7 +61,7 @@ func (c *Client) GetNoteByPath(ctx context.Context, path string) (*Note, error) 
 		query.NoteFromPath.Title,
 		query.NoteFromPath.Content,
 		query.NoteFromPath.ContentHTML,
-		query.NoteFromPath.CoEditing,
+		query.NoteFromPath.Coediting,
 		query.NoteFromPath.PublishedAt,
 		query.NoteFromPath.UpdatedAt,
 		query.NoteFromPath.URL,
@@ -75,7 +75,7 @@ func (c *Client) GetNoteByPath(ctx context.Context, path string) (*Note, error) 
 }
 
 // CreateNote creates a new note.
-func (c *Client) CreateNote(ctx context.Context, input *CreateNoteInput) (*Note, error) {
+func (c *Client) CreateNote(ctx context.Context, input *CreateNoteParams) (*Note, error) {
 	var mutation CreateNoteMutation
 
 	groupIDs := make([]graphql.ID, len(input.GroupIDs))
@@ -83,11 +83,11 @@ func (c *Client) CreateNote(ctx context.Context, input *CreateNoteInput) (*Note,
 		groupIDs[i] = graphql.ID(id)
 	}
 
-	gqlInput := CreateNoteInputGQL{
+	gqlInput := CreateNoteInput{
 		Title:     graphql.String(input.Title),
 		Content:   graphql.String(input.Content),
 		GroupIds:  groupIDs,
-		CoEditing: graphql.Boolean(input.CoEditing),
+		Coediting: graphql.Boolean(input.CoEditing),
 		Draft:     graphql.Boolean(input.Draft),
 	}
 
@@ -115,7 +115,7 @@ func (c *Client) CreateNote(ctx context.Context, input *CreateNoteInput) (*Note,
 		ID:          idToString(mutation.CreateNote.Note.ID),
 		Title:       string(mutation.CreateNote.Note.Title),
 		Content:     string(mutation.CreateNote.Note.Content),
-		CoEditing:   bool(mutation.CreateNote.Note.CoEditing),
+		CoEditing:   bool(mutation.CreateNote.Note.Coediting),
 		PublishedAt: publishedAt,
 		UpdatedAt:   updatedAt,
 		URL:         string(mutation.CreateNote.Note.URL),
@@ -124,7 +124,7 @@ func (c *Client) CreateNote(ctx context.Context, input *CreateNoteInput) (*Note,
 }
 
 // UpdateNote updates an existing note.
-func (c *Client) UpdateNote(ctx context.Context, input *UpdateNoteInput) (*Note, error) {
+func (c *Client) UpdateNote(ctx context.Context, input *UpdateNoteParams) (*Note, error) {
 	// First, get the current note to use as baseNote
 	currentNote, err := c.GetNoteByID(ctx, input.ID)
 	if err != nil {
@@ -143,7 +143,7 @@ func (c *Client) UpdateNote(ctx context.Context, input *UpdateNoteInput) (*Note,
 		newContent = *input.Content
 	}
 
-	gqlInput := UpdateNoteInputGQL{
+	gqlInput := UpdateNoteInput{
 		ID: graphql.ID(input.ID),
 		BaseNote: &NoteContentInput{
 			Title:   graphql.String(currentNote.Title),
@@ -156,8 +156,8 @@ func (c *Client) UpdateNote(ctx context.Context, input *UpdateNoteInput) (*Note,
 	}
 
 	if input.CoEditing != nil {
-		coEditing := graphql.Boolean(*input.CoEditing)
-		gqlInput.CoEditing = &coEditing
+		coediting := graphql.Boolean(*input.CoEditing)
+		gqlInput.Coediting = &coediting
 	}
 
 	if input.Draft != nil {
@@ -184,7 +184,7 @@ func (c *Client) UpdateNote(ctx context.Context, input *UpdateNoteInput) (*Note,
 		ID:          idToString(mutation.UpdateNote.Note.ID),
 		Title:       string(mutation.UpdateNote.Note.Title),
 		Content:     string(mutation.UpdateNote.Note.Content),
-		CoEditing:   bool(mutation.UpdateNote.Note.CoEditing),
+		CoEditing:   bool(mutation.UpdateNote.Note.Coediting),
 		PublishedAt: publishedAt,
 		UpdatedAt:   updatedAt,
 		URL:         string(mutation.UpdateNote.Note.URL),
@@ -198,7 +198,7 @@ func convertQueryNoteToNote(
 	title graphql.String,
 	content graphql.String,
 	contentHTML graphql.String,
-	coEditing graphql.Boolean,
+	coediting graphql.Boolean,
 	publishedAtStr *graphql.String,
 	updatedAtStr graphql.String,
 	url graphql.String,
@@ -207,12 +207,12 @@ func convertQueryNoteToNote(
 	authorAccount graphql.String,
 	authorRealName graphql.String,
 	groupNodes []struct {
-		ID   graphql.ID
-		Name graphql.String
+		ID   graphql.ID     `graphql:"id"`
+		Name graphql.String `graphql:"name"`
 	},
 	folderNodes []struct {
-		ID       graphql.ID
-		FullName graphql.String
+		ID       graphql.ID     `graphql:"id"`
+		FullName graphql.String `graphql:"fullName"`
 	},
 ) (*Note, error) {
 	updatedAt, _ := time.Parse(time.RFC3339, string(updatedAtStr))
@@ -243,7 +243,7 @@ func convertQueryNoteToNote(
 		Title:       string(title),
 		Content:     string(content),
 		ContentHTML: string(contentHTML),
-		CoEditing:   bool(coEditing),
+		CoEditing:   bool(coediting),
 		PublishedAt: publishedAt,
 		UpdatedAt:   updatedAt,
 		URL:         string(url),

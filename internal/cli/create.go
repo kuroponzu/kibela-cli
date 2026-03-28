@@ -111,7 +111,7 @@ func newCreateCmd() *cobra.Command {
 			client := kibela.NewClient(cfg)
 			ctx := context.Background()
 
-			input := &kibela.CreateNoteInput{
+			input := &kibela.CreateNoteParams{
 				Title:     title,
 				Content:   content,
 				GroupIDs:  []string{groupID},

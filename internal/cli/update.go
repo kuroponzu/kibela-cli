@@ -122,7 +122,7 @@ func newUpdateCmd() *cobra.Command {
 			client := kibela.NewClient(cfg)
 			ctx := context.Background()
 
-			input := &kibela.UpdateNoteInput{
+			input := &kibela.UpdateNoteParams{
 				ID: noteID,
 			}
 

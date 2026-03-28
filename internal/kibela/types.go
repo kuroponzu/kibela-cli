@@ -37,8 +37,8 @@ type Folder struct {
 	FullName string `json:"fullName"`
 }
 
-// CreateNoteInput represents input for creating a note.
-type CreateNoteInput struct {
+// CreateNoteParams represents input parameters for creating a note.
+type CreateNoteParams struct {
 	Title     string
 	Content   string
 	GroupIDs  []string
@@ -47,8 +47,8 @@ type CreateNoteInput struct {
 	FolderID  string
 }
 
-// UpdateNoteInput represents input for updating a note.
-type UpdateNoteInput struct {
+// UpdateNoteParams represents input parameters for updating a note.
+type UpdateNoteParams struct {
 	ID        string
 	Title     *string
 	Content   *string

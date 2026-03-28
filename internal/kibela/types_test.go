@@ -55,8 +55,8 @@ func TestNote_JSONMarshal(t *testing.T) {
 	}
 }
 
-func TestCreateNoteInput(t *testing.T) {
-	input := &CreateNoteInput{
+func TestCreateNoteParams(t *testing.T) {
+	input := &CreateNoteParams{
 		Title:     "New Note",
 		Content:   "Content here",
 		GroupIDs:  []string{"group-1", "group-2"},
@@ -76,12 +76,12 @@ func TestCreateNoteInput(t *testing.T) {
 	}
 }
 
-func TestUpdateNoteInput(t *testing.T) {
+func TestUpdateNoteParams(t *testing.T) {
 	title := "Updated Title"
 	content := "Updated Content"
 	coEditing := true
 
-	input := &UpdateNoteInput{
+	input := &UpdateNoteParams{
 		ID:        "note-123",
 		Title:     &title,
 		Content:   &content,
