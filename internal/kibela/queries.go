@@ -124,3 +124,17 @@ type NoteContentInput struct {
 	Title   graphql.String `json:"title"`
 	Content graphql.String `json:"content"`
 }
+
+// GetGroupsQuery is a GraphQL query to get groups.
+type GetGroupsQuery struct {
+	Groups struct {
+		Edges []struct {
+			Node struct {
+				ID         graphql.ID      `graphql:"id"`
+				Name       graphql.String  `graphql:"name"`
+				IsDefault  graphql.Boolean `graphql:"isDefault"`
+				IsArchived graphql.Boolean `graphql:"isArchived"`
+			}
+		}
+	} `graphql:"groups(first: $first)"`
+}

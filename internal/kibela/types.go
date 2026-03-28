@@ -27,8 +27,10 @@ type User struct {
 
 // Group represents a Kibela group.
 type Group struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID         string `json:"id"`
+	Name       string `json:"name"`
+	IsDefault  bool   `json:"isDefault,omitempty"`
+	IsArchived bool   `json:"isArchived,omitempty"`
 }
 
 // Folder represents a Kibela folder.

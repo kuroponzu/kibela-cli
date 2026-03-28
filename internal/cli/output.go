@@ -133,3 +133,32 @@ func (f *Formatter) printNoteUpdatedHuman(note *kibela.Note) error {
 	_, err := f.Writer.Write([]byte(sb.String()))
 	return err
 }
+
+// PrintGroups prints groups in the configured format.
+func (f *Formatter) PrintGroups(groups []kibela.Group) error {
+	if f.Format == FormatJSON {
+		return f.printJSON(groups)
+	}
+	return f.printGroupsHuman(groups)
+}
+
+func (f *Formatter) printGroupsHuman(groups []kibela.Group) error {
+	var sb strings.Builder
+
+	sb.WriteString(fmt.Sprintf("Found %d groups:\n\n", len(groups)))
+
+	for _, g := range groups {
+		defaultStr := ""
+		if g.IsDefault {
+			defaultStr = " (default)"
+		}
+		archivedStr := ""
+		if g.IsArchived {
+			archivedStr = " [archived]"
+		}
+		sb.WriteString(fmt.Sprintf("- %s (ID: %s)%s%s\n", g.Name, g.ID, defaultStr, archivedStr))
+	}
+
+	_, err := f.Writer.Write([]byte(sb.String()))
+	return err
+}

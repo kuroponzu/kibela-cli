@@ -172,3 +172,86 @@ func TestNewFormatter(t *testing.T) {
 		t.Errorf("NewFormatter(false) Format = %v, want FormatHuman", humanFormatter.Format)
 	}
 }
+
+func TestFormatter_PrintGroups_JSON(t *testing.T) {
+	var buf bytes.Buffer
+	formatter := NewFormatter(&buf, true)
+
+	groups := []kibela.Group{
+		{ID: "group-1", Name: "General", IsDefault: true, IsArchived: false},
+		{ID: "group-2", Name: "Engineering", IsDefault: false, IsArchived: false},
+	}
+
+	err := formatter.PrintGroups(groups)
+	if err != nil {
+		t.Fatalf("PrintGroups() error = %v", err)
+	}
+
+	// Verify it's valid JSON
+	var result []map[string]interface{}
+	if err := json.Unmarshal(buf.Bytes(), &result); err != nil {
+		t.Fatalf("Output is not valid JSON: %v", err)
+	}
+
+	if len(result) != 2 {
+		t.Errorf("JSON array length = %v, want %v", len(result), 2)
+	}
+
+	if result[0]["id"] != "group-1" {
+		t.Errorf("JSON id = %v, want %v", result[0]["id"], "group-1")
+	}
+	if result[0]["name"] != "General" {
+		t.Errorf("JSON name = %v, want %v", result[0]["name"], "General")
+	}
+}
+
+func TestFormatter_PrintGroups_Human(t *testing.T) {
+	var buf bytes.Buffer
+	formatter := NewFormatter(&buf, false)
+
+	groups := []kibela.Group{
+		{ID: "group-1", Name: "General", IsDefault: true, IsArchived: false},
+		{ID: "group-2", Name: "Engineering", IsDefault: false, IsArchived: false},
+		{ID: "group-3", Name: "Old Team", IsDefault: false, IsArchived: true},
+	}
+
+	err := formatter.PrintGroups(groups)
+	if err != nil {
+		t.Fatalf("PrintGroups() error = %v", err)
+	}
+
+	output := buf.String()
+
+	checks := []string{
+		"Found 3 groups:",
+		"General (ID: group-1)",
+		"(default)",
+		"Engineering (ID: group-2)",
+		"Old Team (ID: group-3)",
+		"[archived]",
+	}
+
+	for _, check := range checks {
+		if !strings.Contains(output, check) {
+			t.Errorf("Output missing expected text: %q", check)
+		}
+	}
+}
+
+func TestFormatter_PrintGroups_Empty(t *testing.T) {
+	var buf bytes.Buffer
+	formatter := NewFormatter(&buf, false)
+
+	groups := []kibela.Group{}
+
+	err := formatter.PrintGroups(groups)
+	if err != nil {
+		t.Fatalf("PrintGroups() error = %v", err)
+	}
+
+	output := buf.String()
+
+	if !strings.Contains(output, "Found 0 groups:") {
+		t.Error("Output missing count message")
+	}
+}
